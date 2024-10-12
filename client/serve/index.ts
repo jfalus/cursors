@@ -8,8 +8,13 @@ type State = {
   serverPlayers: { [index: string]: Player };
 };
 
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
+
 function setup() {
-  const game = document.getElementsByTagName("canvas")[0];
+  const game = document.getElementById("game") as HTMLCanvasElement;
+  game.width = CANVAS_WIDTH
+  game.height = CANVAS_HEIGHT
   const state: State = {
     box: game.getBoundingClientRect(),
     localPlayer: { X: 0, Y: 0, Id: -1 },
@@ -47,28 +52,22 @@ function handleSocket(state: State, data: ArrayBuffer) {
   switch (messageType) {
     case 0: //"LocalPlayer"
       const player: Player = parseAsPlayer(uint16Arr);
-      console.log(player)
       state.localPlayer = player
       state.serverPlayers[player.Id] = player
       break
     case 1: //"Delta"
-      const deltas: Player[] = [];
       for (let i = 0; i < uint16Arr.length / 3; i++) {
-        deltas.push(parseAsPlayer(uint16Arr.slice(i * 3, (i + 1) * 3)))
-      }
-      for (const player of deltas) {
+        const player = parseAsPlayer(uint16Arr.slice(i * 3, (i + 1) * 3));
         state.serverPlayers[player.Id] = player
       }
       break
     case 2: //"Snapshot"
-      const snapshot: Player[] = [];
+      const newServerPlayers:{[index: string]: Player} = {}
       for (let i = 0; i < uint16Arr.length / 3; i++) {
-        snapshot.push(parseAsPlayer(uint16Arr.slice(i * 3, (i + 1) * 3)))
+        const player = parseAsPlayer(uint16Arr.slice(i * 3, (i + 1) * 3))
+        newServerPlayers[player.Id] = player
       }
-      state.serverPlayers = {}
-      for (const player of snapshot) {
-        state.serverPlayers[player.Id] = player
-      }
+      state.serverPlayers = newServerPlayers
       break
     default:
       console.error(`Invalid message type: ${messageType}`)
@@ -80,8 +79,8 @@ function clamp(n: number, min: number, max: number) {
 }
 
 function updatePosition(state: State, e: MouseEvent) {
-  state.localPlayer.X = clamp(e.clientX - state.box.left, 0, 600)
-  state.localPlayer.Y = clamp(e.clientY - state.box.top, 0, 400)
+  state.localPlayer.X = clamp(e.offsetX, 0, CANVAS_WIDTH)
+  state.localPlayer.Y = clamp(e.offsetY, 0, CANVAS_HEIGHT)
   state.socket.send(new Int16Array([state.localPlayer.X, state.localPlayer.Y]));
 }
 
