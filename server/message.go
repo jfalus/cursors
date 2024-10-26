@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	LocalPlayer uint8 = iota //0
-	Delta       uint8 = iota //1
-	Snapshot    uint8 = iota //2
+	LocalPlayer uint8 = 0
+	Delta       uint8 = 1
+	Snapshot    uint8 = 2
 )
 
 type Message struct {

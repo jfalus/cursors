@@ -20,7 +20,7 @@ type Server struct {
 
 const DELTA_SPEED = 1 * time.Second
 
-// const DELTA_SPEED = 16 * time.Millisecond
+// const DELTA_SPEED = 10 * time.Millisecond
 
 const SNAPSHOT_SPEED = 10 * time.Second
 

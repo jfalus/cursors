@@ -17,7 +17,7 @@ func main() {
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/websocket", server.handleWebSocket)
 
-	fs := http.FileServer(http.Dir("../client/serve"))
+	fs := http.FileServer(http.Dir("../client"))
 	http.Handle("/", fs)
 
 	address := fmt.Sprintf("localhost:%v", PORT)
